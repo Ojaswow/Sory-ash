@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>For you</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Caveat:wght@500;700&family=Figtree:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --night:#150b2b; --plum:#2b1550; --rose:#ff8fb1; --amber:#ffd27a;
+  --mist:#f7ebff; --ember:#ff5a4f;
+  --anger:1; --calm:0;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  background:radial-gradient(120% 90% at 50% 0%,var(--plum),var(--night) 70%);
+  color:var(--mist);
+  font-family:'Figtree',system-ui,sans-serif;
+  overflow:hidden;
+  -webkit-tap-highlight-color:transparent;
+}
+/* the room warms up as the anger drops */
+body::before,body::after{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  transition:opacity 1.6s ease;
+}
+body::before{
+  background:radial-gradient(90% 60% at 50% 105%,rgba(255,90,79,.55),transparent 70%);
+  opacity:calc(var(--anger)*.9);
+}
+body::after{
+  background:radial-gradient(100% 70% at 50% 105%,rgba(255,143,177,.5),rgba(255,210,122,.25) 45%,transparent 75%);
+  opacity:var(--calm);
+}
+#sky{position:fixed;inset:0;width:100%;height:100%;z-index:0}
+
+/* anger meter */
+.meter{
+  position:fixed;top:max(14px,env(safe-area-inset-top));left:50%;transform:translateX(-50%);
+  width:min(88vw,420px);z-index:5;
+}
+.meter-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;font-size:.85rem;opacity:.9}
+.meter-row b{font-family:'Young Serif',serif;font-weight:400;font-size:1.15rem}
+.track{height:10px;border-radius:99px;background:rgba(255,255,255,.12);overflow:hidden}
+.fill{
+  height:100%;width:100%;border-radius:99px;
+  background:linear-gradient(90deg,var(--ember),#ff9a5a,var(--amber));
+  transition:width 1.4s cubic-bezier(.2,.8,.2,1);
+}
+
+/* stage */
+main{
+  position:relative;z-index:2;height:100%;
+  display:flex;align-items:center;justify-content:center;
+  padding:76px 22px 28px;
+}
+.panel{
+  width:min(100%,460px);
+  padding:34px 26px 28px;
+  border-radius:28px;
+  background:rgba(21,11,43,.55);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  box-shadow:0 0 0 1px rgba(255,255,255,.12),0 30px 80px rgba(0,0,0,.45);
+  animation:swap .7s cubic-bezier(.2,.8,.2,1);
+}
+@keyframes swap{from{opacity:0;transform:translateY(14px) scale(.98)}to{opacity:1;transform:none}}
+h1{
+  font-family:'Young Serif',serif;font-weight:400;
+  font-size:clamp(1.9rem,8vw,2.6rem);line-height:1.12;margin-bottom:16px;
+  color:#fff;text-wrap:balance;
+}
+p{font-size:1.08rem;line-height:1.65;max-width:34ch;color:rgba(247,235,255,.92)}
+ul{list-style:none;display:grid;gap:12px;margin-top:2px}
+li{font-size:1.08rem;line-height:1.5;padding-left:26px;position:relative}
+li::before{content:"♥";position:absolute;left:0;color:var(--rose)}
+.sign{font-family:'Caveat',cursive;font-size:1.9rem;color:var(--amber);margin-top:18px}
+.actions{display:flex;flex-direction:column;gap:10px;margin-top:26px}
+button{
+  font:inherit;font-weight:600;font-size:1.02rem;cursor:pointer;
+  padding:14px 20px;border-radius:99px;border:0;color:var(--night);
+  background:linear-gradient(135deg,var(--amber),var(--rose));
+  box-shadow:0 8px 24px rgba(255,143,177,.35);
+  transition:transform .2s,box-shadow .2s;
+}
+button:active{transform:scale(.97)}
+button.ghost{background:transparent;color:var(--mist);box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.3)}
+button:focus-visible,input:focus-visible{outline:3px solid var(--amber);outline-offset:3px}
+input{
+  width:100%;margin-top:20px;padding:14px 18px;border-radius:99px;
+  border:0;background:rgba(255,255,255,.1);color:#fff;font:inherit;font-size:1.05rem;
+  box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.25);
+}
+input::placeholder{color:rgba(247,235,255,.5)}
+.reply{font-family:'Caveat',cursive;font-size:1.7rem;color:var(--amber);margin-top:16px;line-height:1.2}
+.hidden{display:none}
+
+/* lanterns + hearts */
+.lantern{
+  position:fixed;bottom:-120px;z-index:3;pointer-events:none;
+  width:76px;text-align:center;
+  animation:rise 11s cubic-bezier(.3,.1,.4,1) forwards;
+}
+.lantern .glow{
+  width:54px;height:70px;margin:0 auto;border-radius:46% 46% 38% 38%;
+  background:radial-gradient(circle at 50% 70%,#fff3c4,var(--amber) 45%,#ff9a5a);
+  box-shadow:0 0 40px 12px rgba(255,210,122,.55);
+}
+.lantern span{
+  display:block;margin-top:10px;font-family:'Caveat',cursive;font-size:1.25rem;line-height:1;
+  color:#fff;text-shadow:0 2px 10px rgba(0,0,0,.6);width:150px;margin-left:-37px;
+}
+@keyframes rise{
+  0%{transform:translate(0,0);opacity:0}
+  8%{opacity:1}
+  100%{transform:translate(var(--sway),-115vh);opacity:0}
+}
+.heart{
+  position:fixed;z-index:6;pointer-events:none;font-size:var(--s);
+  left:50%;top:60%;
+  animation:pop 2.4s cubic-bezier(.1,.7,.3,1) forwards;
+}
+@keyframes pop{
+  0%{transform:translate(-50%,-50%) scale(.2);opacity:1}
+  100%{transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) scale(1) rotate(var(--r));opacity:0}
+}
+@media (prefers-reduced-motion:reduce){
+  .panel{animation:none}
+  .lantern{animation-duration:1ms}
+  .heart{animation-duration:1ms}
+  .fill{transition:none}
+}
+</style>
+</head>
+<body>
+<canvas id="sky" aria-hidden="true"></canvas>
+
+<div class="meter" aria-live="polite">
+  <div class="meter-row"><span id="mlabel">Anger level</span><b id="mnum">100%</b></div>
+  <div class="track"><div class="fill" id="mfill"></div></div>
+</div>
+
+<main><section class="panel" id="panel"></section></main>
+
+<script>
+/* ===== EDIT THIS PART ===== */
+const CFG = {
+  her: "Cutiepie",          // her name or nickname
+  me: "Ojas",               // your name
+  intro: "I made you something. It's short, I promise. Please give me a minute to say it properly.",
+  say: [
+    { t: "I owe you a real apology.",
+      b: "I called your dreams delulu, and then I said \"what if I die\" like it was a punchline. It wasn't, and it wasn't fair to say to you." },
+    { t: "Your dreams are not delulu.",
+      b: "ohk I agree my kuchu puchu it's our future pookie.Please please plasee let anger downnnnnn pleaseeeee😭😭😭 I loveee uuuuuu..ASHHHHHH" },
+    { t: "I got it wrong.",
+      b: "If something scared me, I should have said so honestly. I picked a heavy line instead, and it landed on you. That's on me, not you." },
+    { t: "What I'll do instead.",
+      list: ["Listen first, joke later.", "Never call your dreams delulu again.", "Say the honest thing, even when it's awkward.", "Never use something scary to win a conversation."] }
+  ],
+  wishTitle: "Tell me one dream.",
+  wishBody: "Any size. I'll never call it delulu.",
+  wishReply: "Look at it go. I believe in that one.",
+  finalTitle: "So... can I have my favorite person back?"
+};
+/* ========================== */
+
+const panel = document.getElementById('panel');
+const mfill = document.getElementById('mfill');
+const mnum  = document.getElementById('mnum');
+const mlabel= document.getElementById('mlabel');
+const root  = document.documentElement.style;
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function setAnger(v){
+  mfill.style.width = v + '%';
+  root.setProperty('--anger', v/100);
+  root.setProperty('--calm', 1 - v/100);
+  // count the number smoothly
+  const from = parseInt(mnum.textContent) || 0, t0 = performance.now(), dur = reduce ? 1 : 1400;
+  (function tick(now){
+    const k = Math.min(1,(now-t0)/dur), e = 1-Math.pow(1-k,3);
+    mnum.textContent = Math.round(from + (v-from)*e) + '%';
+    if(k<1) requestAnimationFrame(tick);
+  })(t0);
+  mlabel.textContent = v === 0 ? 'Anger level (gone)' : 'Anger level';
+}
+
+const levels = [78, 60, 42, 28];
+let step = 0;
+
+function el(html){ panel.innerHTML = html; panel.style.animation='none'; void panel.offsetWidth; panel.style.animation=''; }
+const esc = s => s.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+function intro(){
+  setAnger(100);
+  el(`<h1>${esc(CFG.her)}, I'm sorry.</h1>
+      <p>${esc(CFG.intro)}</p>
+      <div class="actions"><button id="go">Okay, I'll listen</button></div>`);
+  document.getElementById('go').onclick = () => { step = 0; say(); };
+}
+
+function say(){
+  const s = CFG.say[step];
+  const body = s.list ? `<ul>${s.list.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>` : `<p>${esc(s.b)}</p>`;
+  el(`<h1>${esc(s.t)}</h1>${body}<div class="actions"><button id="nx">Keep going</button></div>`);
+  setAnger(levels[step] ?? 28);
+  document.getElementById('nx').onclick = () => {
+    step++;
+    step < CFG.say.length ? say() : wish();
+  };
+}
+
+function wish(){
+  setAnger(18);
+  el(`<h1>${esc(CFG.wishTitle)}</h1>
+      <p>${esc(CFG.wishBody)}</p>
+      <input id="w" maxlength="60" placeholder="Say it out loud..." autocomplete="off">
+      <div class="reply hidden" id="wr">${esc(CFG.wishReply)}</div>
+      <div class="actions">
+        <button id="rel">Release it</button>
+        <button class="ghost hidden" id="nx2">One more thing</button>
+      </div>`);
+  const inp = document.getElementById('w');
+  document.getElementById('rel').onclick = () => {
+    const v = inp.value.trim();
+    if(!v){ inp.focus(); return; }
+    lantern(v);
+    document.getElementById('wr').classList.remove('hidden');
+    document.getElementById('nx2').classList.remove('hidden');
+    document.getElementById('rel').textContent = 'Release another';
+    inp.value = '';
+  };
+  inp.addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('rel').click(); });
+  document.getElementById('nx2').onclick = final;
+}
+
+function final(){
+  el(`<h1>${esc(CFG.finalTitle)}</h1>
+      <div class="actions">
+        <button id="yes">Yes, come here</button>
+        <button class="ghost" id="maybe">Maybe a little</button>
+        <button class="ghost" id="not">Not yet</button>
+      </div>
+      <div class="reply hidden" id="fr"></div>`);
+  const fr = document.getElementById('fr');
+  const say2 = t => { fr.textContent = t; fr.classList.remove('hidden'); };
+  document.getElementById('yes').onclick = () => {
+    setAnger(0); burst(46);
+    for(let i=0;i<5;i++) setTimeout(()=>lantern(['sorry','you matter','my person','thank you','always'][i]), i*350);
+    el(`<h1>Anger level: 0%.</h1>
+        <p>Thank you for giving me another chance. I'll be better, and I mean it.</p>
+        <p style="margin-top:12px">I owe you one very big hug.</p>
+        <div class="sign">${esc(CFG.me)}</div>`);
+  };
+  document.getElementById('maybe').onclick = () => { setAnger(10); say2("A little is a start. I'll earn the rest."); burst(12); };
+  document.getElementById('not').onclick   = () => { say2("That's fair. Take all the time you need. I'm not going anywhere."); };
+}
+
+/* ---- lanterns & hearts ---- */
+function lantern(text){
+  const d = document.createElement('div');
+  d.className = 'lantern';
+  d.style.left = (12 + Math.random()*66) + 'vw';
+  d.style.setProperty('--sway', (Math.random()*80-40) + 'px');
+  d.innerHTML = '<div class="glow"></div><span></span>';
+  d.querySelector('span').textContent = text;
+  document.body.appendChild(d);
+  setTimeout(()=>d.remove(), 11500);
+}
+function burst(n){
+  const set = ['💖','💗','💕','✨','🌸','🫶'];
+  for(let i=0;i<n;i++){
+    const h = document.createElement('div');
+    h.className = 'heart';
+    h.textContent = set[i % set.length];
+    const a = Math.random()*Math.PI*2, r = 90 + Math.random()*Math.min(innerWidth,520)*.5;
+    h.style.setProperty('--dx', Math.cos(a)*r + 'px');
+    h.style.setProperty('--dy', Math.sin(a)*r*1.2 - 80 + 'px');
+    h.style.setProperty('--r', (Math.random()*60-30) + 'deg');
+    h.style.setProperty('--s', (18 + Math.random()*22) + 'px');
+    document.body.appendChild(h);
+    setTimeout(()=>h.remove(), 2500);
+  }
+}
+
+/* ---- night sky: stars + fireflies ---- */
+const cv = document.getElementById('sky'), cx = cv.getContext('2d');
+let W, H, D, stars = [], flies = [];
+function size(){
+  D = Math.min(devicePixelRatio||1, 2);
+  W = cv.width = innerWidth*D; H = cv.height = innerHeight*D;
+  stars = Array.from({length:90},()=>({x:Math.random()*W,y:Math.random()*H*.8,r:(.4+Math.random()*1.2)*D,p:Math.random()*6.28}));
+  flies = Array.from({length:26},()=>({x:Math.random()*W,y:Math.random()*H,r:(1.5+Math.random()*2.5)*D,p:Math.random()*6.28,s:.15+Math.random()*.35}));
+}
+function draw(t){
+  cx.clearRect(0,0,W,H);
+  for(const s of stars){
+    cx.globalAlpha = .35 + .35*Math.sin(t/900 + s.p);
+    cx.fillStyle = '#fff'; cx.beginPath(); cx.arc(s.x,s.y,s.r,0,6.28); cx.fill();
+  }
+  for(const f of flies){
+    f.x += Math.sin(t/2200 + f.p)*f.s*D; f.y += Math.cos(t/2600 + f.p)*f.s*D*.6 - .05*D;
+    if(f.y < -10) f.y = H + 10; if(f.x < -10) f.x = W + 10; if(f.x > W+10) f.x = -10;
+    const a = .5 + .5*Math.sin(t/700 + f.p);
+    cx.globalAlpha = a*.18; cx.fillStyle = '#ffd27a'; cx.beginPath(); cx.arc(f.x,f.y,f.r*4,0,6.28); cx.fill();
+    cx.globalAlpha = a*.9;  cx.beginPath(); cx.arc(f.x,f.y,f.r,0,6.28); cx.fill();
+  }
+  if(!reduce) requestAnimationFrame(draw);
+}
+addEventListener('resize', size);
+size(); requestAnimationFrame(draw);
+
+intro();
+</script>
+</body>
+</html>
